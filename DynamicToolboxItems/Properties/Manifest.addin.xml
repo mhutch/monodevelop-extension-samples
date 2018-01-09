@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionModel>
+	<Runtime>
+	</Runtime>
+
+    <Extension path="/MonoDevelop/DesignerSupport/ToolboxProviders">
+        <Class class="DynamicToolboxItems.MyDynamicToolboxProvider" />
+    </Extension>
+</ExtensionModel>
