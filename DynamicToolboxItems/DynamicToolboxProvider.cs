@@ -86,6 +86,7 @@ namespace DynamicToolboxItems
             Icon = ImageService.GetIcon(Stock.TextFileIcon, Gtk.IconSize.Menu);
 
             // you won't get an error if these are empty/null
+            // see https://github.com/mono/monodevelop/issues/3604
             Category = "My Dynamic Section";
             Description = "Toolbox description for tooltip";
             Name = "My Dynamic Item";
