@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ExtensionModel>
     <Extension path = "/MonoDevelop/Ide/Commands/Edit">
-        <Command id = "MainMenuCommand.DateInserterCommands.InsertDate"
+        <Command id = "MonoDevelop.Samples.MainMenuCommand.DateInserterCommands.InsertDate"
                  _label = "Insert Date"
-                 defaultHandler = "MainMenuCommand.InsertDateHandler"/>
+                 defaultHandler = "MonoDevelop.Samples.MainMenuCommand.InsertDateHandler"/>
     </Extension>
 
     <Extension path = "/MonoDevelop/Ide/MainMenu/Edit">
-        <CommandItem id="MainMenuCommand.DateInserterCommands.InsertDate" />
+        <CommandItem id="MonoDevelop.Samples.MainMenuCommand.DateInserterCommands.InsertDate" />
     </Extension>
 </ExtensionModel>

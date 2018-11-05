@@ -29,11 +29,11 @@ using Mono.Addins.Description;
 
 [assembly: Addin(
     "MainMenuCommand",
-    Namespace = "MainMenuCommand",
+    Namespace = "MonoDevelop.Samples",
     Version = "1.0"
 )]
 
-[assembly: AddinName("MainMenuCommand")]
-[assembly: AddinCategory("IDE extensions")]
-[assembly: AddinDescription("MainMenuCommand")]
+[assembly: AddinName("Main Menu Command")]
+[assembly: AddinCategory("Samples")]
+[assembly: AddinDescription("Adds a main menu command that inserts the date into the source editor")]
 [assembly: AddinAuthor("Mikayla Hutchinson")]

@@ -2,7 +2,7 @@
 using MonoDevelop.Components.Commands;
 using MonoDevelop.Ide;
 
-namespace MainMenuCommand
+namespace MonoDevelop.Samples.MainMenuCommand
 {
     class InsertDateHandler : CommandHandler
     {
