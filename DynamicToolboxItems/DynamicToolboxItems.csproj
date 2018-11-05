@@ -8,5 +8,6 @@
   </ItemGroup>
   <ItemGroup>
     <AddinReference Include="MonoDevelop.DesignerSupport" />
+    <AddinReference Include="Xamarin.FormsPreviewer" />
   </ItemGroup>
 </Project>

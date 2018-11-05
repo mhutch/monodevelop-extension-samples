@@ -10,7 +10,7 @@ using MonoDevelop.Ide.Editor.Extension;
 using MonoDevelop.Ide.Gui;
 using MonoDevelop.Projects.Text;
 
-namespace DynamicToolboxItems
+namespace MonoDevelop.Samples.DynamicToolboxItems
 {
     //NOTE: this is registered in the addin manifest
     public class MyDynamicToolboxProvider : IToolboxDynamicProvider
@@ -24,53 +24,35 @@ namespace DynamicToolboxItems
         public IEnumerable<ItemToolboxNode> GetDynamicItems(IToolboxConsumer consumer)
         {
             // if it's a text editor view, it should be a subclass of ViewContent
-            // and implement ITextFile
-            if (consumer is ViewContent vc && vc is ITextFile)
-            {
-                var editor = GetContentWithWorkarounds<TextEditor>(vc);
 
-                // the toolbox crashes in XAML files, see devdiv#548996
-                if (editor == null || editor.MimeType == "application/xaml+xml")
+            if (consumer is ViewContent vc)
+            {
+                var editor = EditorWorkarounds.GetTextEditor(vc);
+                if (editor == null)
                 {
                     yield break;
                 }
 
                 // here you'd typically return a whole set of nodes.
                 // you'd typically cache them too.
-                yield return new MyToolboxNode();
-            }
-        }
 
-
-        // work around issues on GetContent on SourceEditorView
-        T GetContentWithWorkarounds<T> (ViewContent vc) where T : class
-        {
-            // https://github.com/mono/monodevelop/issues/3559
-            // GetContent<TextEditor> on a SourceEditorView returns null, need
-            // to go up to the document via the window
-            var content = vc?.WorkbenchWindow?.Document?.GetContent<T>();
-            if (content != null) {
-                return content;
-            }
-
-            // WorkbenchWindow on the SourceViewContent in the XAML editor is null (devdiv#548308)
-            // it's re-hosted inside the previewer's splitter view, which doesn't
-            // wire up the child correctly
-            if (vc.WorkbenchWindow == null)
-            {
-                // if it's SourceEditorView we can get the Document from the
-                // EditorExtension property
-                var editorImplType = typeof(TextEditor).Assembly.GetType("MonoDevelop.Ide.Editor.ITextEditorImpl");
-                if (editorImplType.IsAssignableFrom(vc.GetType())) {
-                    var prop = editorImplType.GetProperty("EditorExtension");
-                    if (prop != null)
+                // The XAML previewer regressed support for normal text nodes, they are displayed
+                // but do not work. See devdiv#723997.
+                // Work around this for now using the custom node type.
+                if (EditorWorkarounds.IsXamlPreviewer(vc))
+                {
+                    yield return new Xamarin.Designer.Forms.FormsTextToolboxNode("My Custom XAML Node")
                     {
-                        var ext = prop.GetValue(vc) as TextEditorExtension;
-                        return ext?.DocumentContext?.GetContent<T>();
-                    }
+                        Category = "My Custom Category",
+                        Name = "My Custom XAML Node",
+                        Icon = ImageService.GetIcon(Stock.TextFileIcon, Gtk.IconSize.Menu)
+                    };
+                }
+                else
+                {
+                    yield return new MyToolboxNode();
                 }
             }
-            return null;
         }
     }
 
@@ -81,7 +63,7 @@ namespace DynamicToolboxItems
     {
         public MyToolboxNode()
         {
-            // the IDE crashes unless we set an icon with an explicit size
+            // prior to 7.5, the IDE crashes unless we set an icon with an explicit size
             // https://github.com/mono/monodevelop/issues/3590
             Icon = ImageService.GetIcon(Stock.TextFileIcon, Gtk.IconSize.Menu);
 
@@ -101,12 +83,84 @@ namespace DynamicToolboxItems
         {
             // you could actually do more complex things here, like adding
             // references to the project, or performing refactorings
-            document.Editor.InsertAtCaret("This is the inserted text");
+            var editor = EditorWorkarounds.GetActiveTextEditor(document);
+            editor.InsertAtCaret("This is the inserted text");
         }
 
         public bool IsCompatibleWith(Document document)
         {
-            return document.Editor.MimeType == "application/xaml";
+            var editor = EditorWorkarounds.GetActiveTextEditor(document);
+            return editor.MimeType == "application/xaml";
+        }
+    }
+
+    // for the standard source editor, ActiveView.GetContent<TextEditor> returns nothing
+    // but for the XAML previewer, document.TextEditor is not wired up
+    // try to paper over this inconsistency
+    static class EditorWorkarounds
+    {
+        /// <summary>
+        /// Gets the TextEditor for the active ViewContent.
+        /// </summary>
+        public static TextEditor GetActiveTextEditor(Document document)
+        {
+            return document.ActiveView.GetContent<TextEditor>() ?? document.Editor;
+        }
+
+        /// <summary>
+        /// Gets the TextEditor for the ViewContent.
+        /// </summary>
+        public static TextEditor GetTextEditor(ViewContent vc)
+        {
+            // We need to check the active view we call GetContent, or we
+            // might get a chained value from another, non-visible view, which
+            // is usually desired but not in this case.
+            // 
+            //if it's a text editor it should implement ITextFile
+            //however, the XAML previewer currently does not, so special case it
+            if (vc is ITextFile || IsXamlPreviewer(vc))
+            {
+                return GetContentWithWorkarounds<TextEditor>(vc);
+            }
+            return null;
+        }
+
+        public static bool IsXamlPreviewer (ViewContent vc)
+        {
+            return vc.GetType().FullName == "Xamarin.Designer.Forms.XamarinStudioXamlPreviewerView";
+        }
+
+        // work around issues on GetContent on SourceEditorView
+        static T GetContentWithWorkarounds<T>(ViewContent vc) where T : class
+        {
+            // https://github.com/mono/monodevelop/issues/3559
+            // GetContent<TextEditor> on a SourceEditorView returns null, need
+            // to go up to the document via the window
+            var content = vc?.WorkbenchWindow?.Document?.GetContent<T>();
+            if (content != null)
+            {
+                return content;
+            }
+
+            // WorkbenchWindow on the SourceViewContent in the XAML editor is null (devdiv#548308)
+            // it's re-hosted inside the previewer's splitter view, which doesn't
+            // wire up the child correctly
+            if (vc.WorkbenchWindow == null)
+            {
+                // if it's SourceEditorView we can get the Document from the
+                // EditorExtension property
+                var editorImplType = typeof(TextEditor).Assembly.GetType("MonoDevelop.Ide.Editor.ITextEditorImpl");
+                if (editorImplType.IsAssignableFrom(vc.GetType()))
+                {
+                    var prop = editorImplType.GetProperty("EditorExtension");
+                    if (prop != null)
+                    {
+                        var ext = prop.GetValue(vc) as TextEditorExtension;
+                        return ext?.DocumentContext?.GetContent<T>();
+                    }
+                }
+            }
+            return null;
         }
     }
 }

@@ -4,6 +4,6 @@
 	</Runtime>
 
     <Extension path="/MonoDevelop/DesignerSupport/ToolboxProviders">
-        <Class class="DynamicToolboxItems.MyDynamicToolboxProvider" />
+        <Class class="MonoDevelop.Samples.DynamicToolboxItems.MyDynamicToolboxProvider" />
     </Extension>
 </ExtensionModel>

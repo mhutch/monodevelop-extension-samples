@@ -29,11 +29,11 @@ using Mono.Addins.Description;
 
 [assembly: Addin(
     "DynamicToolboxItems",
-    Namespace = "DynamicToolboxItems",
+    Namespace = "MonoDevelop.Samples",
     Version = "1.0"
 )]
 
-[assembly: AddinName("DynamicToolboxItems")]
-[assembly: AddinCategory("Extension Samples")]
-[assembly: AddinDescription("DynamicToolboxItems")]
+[assembly: AddinName("Dynamic Toolbox Items")]
+[assembly: AddinCategory("Samples")]
+[assembly: AddinDescription("Dynamically inserts items into the toolbox")]
 [assembly: AddinAuthor("Mikayla Hutchinson")]
