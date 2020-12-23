@@ -1,12 +1,46 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ExtensionModel>
-    <Extension path = "/MonoDevelop/Ide/Commands/Edit">
-        <Command id = "MonoDevelop.Samples.MainMenuCommand.DateInserterCommands.InsertDate"
-                 _label = "Insert Date"
-                 defaultHandler = "MonoDevelop.Samples.MainMenuCommand.InsertDateHandler"/>
+    <!--
+    Because this extension uses the MEF-based VS Editor extension API for one of
+    the commands, it must be added to the MEF composition-->
+    <Extension path="/MonoDevelop/Ide/Composition">
+        <Assembly file="MonoDevelop.Samples.MainMenuCommand.dll" />
     </Extension>
-
+    
+    <!--
+    Define monodevelop shell commands.
+    The commands will be accessible from search, and can have keys bound to them
+    in preferences.
+    Commands may be handled contextually by handlers on UI components, and/or
+    they may have a default handler that is used when no contextual handler is found.
+    If no contextual or default handler is found, the command is automatically disabled.
+    -->
+    <Extension path = "/MonoDevelop/Ide/Commands/Edit">
+        <Command id = "MonoDevelop.Samples.MainMenuCommand.DateInserterCommands.ShowDate"
+                 _label = "Show Date"
+                 defaultHandler = "MonoDevelop.Samples.MainMenuCommand.ShowDateCommandHandler"/>
+        <Command id = "MonoDevelop.Samples.MainMenuCommand.DateInserterCommands.InsertDate"
+                 _label = "Insert Date" />
+    </Extension>
+    
+    <!--
+    Add the commands we just defined to the edit menu.
+    Commands may be registered into any number of locations in the main menu and
+    context menus, or may be left accessible only from search and keybindings.
+    -->
     <Extension path = "/MonoDevelop/Ide/MainMenu/Edit">
+        <CommandItem id="MonoDevelop.Samples.MainMenuCommand.DateInserterCommands.ShowDate" />
         <CommandItem id="MonoDevelop.Samples.MainMenuCommand.DateInserterCommands.InsertDate" />
+    </Extension>
+    
+    <!--
+    Map the monodevelop shell command to a VS Editor command args class.
+    This means that when the editor is focused, it will contextually handle this
+    MD shell command and dispatch it to the VS Editor commanding system with the
+    specified args type.
+    -->
+    <Extension path="/MonoDevelop/TextEditor/CommandMapping">
+        <Map id="MonoDevelop.Samples.MainMenuCommand.DateInserterCommands.InsertDate"
+             argsType="MonoDevelop.Samples.MainMenuCommand.InsertDateCommandArgs" />
     </Extension>
 </ExtensionModel>

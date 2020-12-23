@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicToolboxItems", "DynamicToolboxItems\DynamicToolboxItems.csproj", "{96AD3386-D512-4727-9D55-8BF45C6FAF49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainMenuCommand", "MainMenuCommand\MainMenuCommand.csproj", "{69AE8288-4B0E-40BD-A1BE-BC30DC9808D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoDevelop.Samples.MainMenuCommand", "MainMenuCommand\MonoDevelop.Samples.MainMenuCommand.csproj", "{69AE8288-4B0E-40BD-A1BE-BC30DC9808D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
